@@ -45,6 +45,20 @@ class PID {
   double Kp;
   double Ki;
   double Kd;
+
+  double dpp;
+  double dpi;
+  double dpd;
+
+  double * getKbyId(const int& id);
+  double * getDpbyId(const int& id);
+  int current_id;
+  int current_sequence;
+
+public:
+    double best_err;
+    bool best_err_initialized;
+    void twiddle(double err);
 };
 
 #endif  // PID_H
