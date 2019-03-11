@@ -22,9 +22,9 @@ void PID::Init(double Kp_, double Ki_, double Kd_) {
    i_error = 0;
    d_error = 0;
 
-   dpp = 0.01;
+   dpp = 0.005;
    dpi = 0.0001;
-   dpd = 0.1;
+   dpd = 0.05;
 
    current_id = 0;
    current_sequence = 0;

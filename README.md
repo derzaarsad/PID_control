@@ -93,6 +93,66 @@ that's just a guess.
 One last note here: regardless of the IDE used, every submitted project must
 still be compilable with cmake and make./
 
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
+## Reflection
+In my PID control implementation, I see that the Proportional control parameter (P) corrects the driving position
+automatically, however because of the linear property of the correction, the car cannot stay stable in the middle
+which caused problem by an extreme road curve (see the video below)
 
+Adding a Differential control parameter (D) solves this problem. This is logically correct because D parameter
+adjusts the correction with respect to the distance of the car from the reference line. It means that using this
+the amount of correction will be stronger if the car is far from the reference line. The car can now stay in the
+line as seen in the video below
+
+I experimentally added an Integration control (I) to the system and saw that the car reacts very quickly to every
+deviation, which unfortunately leads to overshoot of the car trajectory.
+
+I used twiddle to automate the parameter optimization. The concept is identical as the one that I learned in the
+course, however I minimize the needs of collecting the error history by separating the process into sequences
+where each sequence is called in every steering value calculation
+```cpp
+void PID::twiddle(double err) {
+
+    double* K = getKbyId(current_id);
+    double* dp = getDpbyId(current_id);
+
+    switch (current_sequence) {
+        case 0:
+            (*K) += (*dp);
+            current_sequence++;
+            break;
+        case 1:
+            if (err < best_err) {
+                best_err = err;
+                (*dp) *= 1.1;
+
+                // reset
+                current_id = (current_id >= 2) ? 0 : (current_id+1);
+                current_sequence = 0;
+            }
+
+            else {
+                (*K) -= 2 * (*dp);
+                current_sequence++;
+            }
+            break;
+        case 2:
+            if (err < best_err) {
+                best_err = err;
+                (*dp) *= 1.1;
+            }
+            else {
+                (*K) += (*dp);
+                (*dp) *= 0.9;
+            }
+
+            // reset
+            current_id = (current_id >= 2) ? 0 : (current_id+1);
+            current_sequence = 0;
+            break;
+        default:
+            throw ("Sequence must be reset");
+    }
+}
+```
+
+The final parameters are Kp=0.13165, Ki=0.00236164, Kd=1.79067
