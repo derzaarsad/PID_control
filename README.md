@@ -98,13 +98,19 @@ In my PID control implementation, I see that the Proportional control parameter 
 automatically, however because of the linear property of the correction, the car cannot stay stable in the middle
 which caused problem by an extreme road curve (see the video below)
 
+https://www.youtube.com/watch?v=CLloDodLZ_M
+
 Adding a Differential control parameter (D) solves this problem. This is logically correct because D parameter
 adjusts the correction with respect to the distance of the car from the reference line. It means that using this
 the amount of correction will be stronger if the car is far from the reference line. The car can now stay in the
 line as seen in the video below
 
+https://www.youtube.com/watch?v=PCVIHTZR3ls
+
 I experimentally added an Integration control (I) to the system and saw that the car reacts very quickly to every
-deviation, which unfortunately leads to overshoot of the car trajectory.
+deviation, which unfortunately leads to overshoot of the car trajectory
+
+https://www.youtube.com/watch?v=1tvPPHexcFY
 
 I used twiddle to automate the parameter optimization. The concept is identical as the one that I learned in the
 course, however I minimize the needs of collecting the error history by separating the process into sequences
@@ -155,4 +161,6 @@ void PID::twiddle(double err) {
 }
 ```
 
-The final parameters are Kp=0.13165, Ki=0.00236164, Kd=1.79067
+The final parameters are Kp=0.13165, Ki=0.00236164, Kd=1.79067 and the result can be seen below
+
+https://www.youtube.com/watch?v=df3OAJvaFiY
